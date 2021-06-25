@@ -6,6 +6,8 @@ Ideal for objective lists, todo lists, schedules or whatever else comes in list 
 
 This overlay includes use of local browser storage — lists are saved and can be re-used on subsequent streams on the same channel.
 
+<img width="966" src="https://user-images.githubusercontent.com/986185/123448347-ba471080-d5d2-11eb-8065-73154500c126.png">
+
 ## Installation
 
 If you want to use this overlay, you'll need OBS or similar and be comfortable editing a settings file for configuration.
