@@ -1,0 +1,75 @@
+.overlayList {
+    align-items: center;
+    display: grid;
+    justify-content: end;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+.overlayList__root {
+    background-color: rgba(0, 0, 0, 0.5);
+    font-family: 'Open Sans Condensed';
+    max-height: calc(60vh - 20px);
+    opacity: 0;
+    overflow: hidden;
+    padding: 20px;
+    margin-right: 20px;
+    transition: opacity 0.5s, height 0.5s;
+    width: calc(20vw - 20px);
+}
+
+.overlayList__root--active {
+    opacity: 1;
+}
+
+.overlayList__list {
+    align-items: flex-start;
+    display: flex;
+    flex-flow: column;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.overlayList__list:not(:empty) {
+    border-top: 1px solid;
+    padding-top: 6px;
+    margin-top: 6px;
+}
+
+.overlayList__listItem--complete {
+    display: block;
+    position: relative;
+    width: auto;
+}
+
+.overlayList__listItem--complete .overlayList__listItemLine {
+    content: '';
+    display: block;
+    height: 2px;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+}
+
+.overlayList__listItem--complete:empty {
+    display: none;
+}
+
+.overlayList__root h1 {
+    display: inline-block;
+    font-weight: 700;
+    margin: 0;
+}
+
+h1 img.emoticon {
+    height: 30px;
+    margin-bottom: -4px;
+}
+
+.overlayList__listItem img.emoticon {
+    height: 22px;
+    margin-bottom: -4px;
+}

@@ -1,0 +1,16 @@
+{
+  "name": "TwitchListOverlay",
+  "version": "1.0.0",
+  "description": "Used to display a simple list overlay in OBS or whatever",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "github.com/matthewjohnston4",
+  "license": "ISC",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app": "^3.1.2"
+  }
+}

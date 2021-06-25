@@ -1,0 +1,18 @@
+// Fill in your twitchUser and rename this file to config-local.js
+
+// When someone initiate commands, you can optionally enable this overlay to notify the
+// user whenever there's something incorrect about their use of the command.
+// To use this error notification functionality, you'll need a Twitch account that you want to
+// authorize for API use. You can use your main Twitch account, but messages will appear to come
+// from it. Or you can create an alternate account with a Bot-like username. It's up to you.
+// Whatever account you choose, goto https://twitchapps.com/tmi/ while logged in and click "Connect"
+// Then paste the entire `oauth:abcdefhgihihjisdsa` string into 'password' below.
+// `botUsername` should be the Twitch username of whatever account you want to use for replies.
+
+// If you don't want to use chat reply, just leave the values blank.
+
+const configLocal = {
+  "twitchUser": ""
+  "password": "",
+  "botUsername": "",
+};
