@@ -111,12 +111,10 @@ var App = function App() {
         return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(_context, _textContent) {
-        if (title !== "" || items.length > 0) {
-          if (!active) {
-            maybePlaySound(config.sounds.activate);
-          }
-          setActive(true);
+        if (!active) {
+          maybePlaySound(config.sounds.activate);
         }
+        setActive(true);
       }
     },
     // =======================================
