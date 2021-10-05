@@ -30,6 +30,17 @@ var App = function App() {
       active = _React$useState6[0],
       setActive = _React$useState6[1];
 
+  var _React$useState7 = React.useState(false),
+      _React$useState8 = _slicedToArray(_React$useState7, 2),
+      removalPaused = _React$useState8[0],
+      _setRemovalPaused = _React$useState8[1];
+
+  var removalPausedRef = React.useRef(removalPaused);
+  var setRemovalPaused = function setRemovalPaused(data) {
+    removalPausedRef.current = data;
+    _setRemovalPaused(data);
+  };
+
   var formatText = function formatText(message, emotes) {
     var makeUpperCase = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
@@ -160,16 +171,29 @@ var App = function App() {
       }
     },
     // =======================================
-    // Command: !list:remove <name>
-    // Description: removes an item in the list using its name (to avoid mod collisions)
+    // Command: !list:remove <identifier>
+    // Description: removes an item in the list using its identifier (see README)
     // =======================================
     ":remove": {
       security: function security(context, _textContent) {
         return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(context, command) {
-        var name = formatText(command, context.emotes).split(config.commandNameBase + ":remove ")[1];
-        return removeTask(name);
+        var identifier = formatText(command, context.emotes).split(config.commandNameBase + ":remove ")[1];
+        return removeTask(identifier);
+      }
+    },
+    // =======================================
+    // Command: !list:remove <index>
+    // Description: removes an item in the list using its 1-based index
+    // =======================================
+    ":removeIndex": {
+      security: function security(context, _textContent) {
+        return isMod(context) || isBroadcaster(context);
+      },
+      handle: function handle(context, command) {
+        var identifier = formatText(command, context.emotes).split(config.commandNameBase + ":removeIndex ")[1];
+        return removeTask(identifier, true);
       }
     },
     // =======================================
@@ -280,20 +304,71 @@ var App = function App() {
     });
   };
 
-  var removeTask = function removeTask(name) {
+  var removeTask = function removeTask(identifier, forceIndex) {
     var response = null;
-    if (name && name !== "") {
-      setItems(function (items) {
-        var idx = items.findIndex(function (item) {
-          return item.text.toLowerCase() === name.toLowerCase();
+    var method = config.handlerOptions.removalMethod;
+    if (forceIndex) {
+      method = 'index';
+    }
+    var debounce = 3000;
+    if (config.handlerOptions.removalDebounce && Number.isInteger(config.handlerOptions.removalDebounce)) {
+      debounce = config.handlerOptions.removalDebounce * 1000;
+    }
+    if (identifier && identifier !== "") {
+      if (method === 'index' && removalPausedRef.current) {
+        response = "you can't use this command just now, try again in " + debounce / 1000 + " seconds";
+      } else {
+        setItems(function (items) {
+          var idx = -1;
+          switch (method) {
+            case 'fullText':
+              idx = items.findIndex(function (item) {
+                return item.text.toLowerCase() === identifier.toLowerCase();
+              });
+              break;
+            case 'startsWithText':
+              var found = items.filter(function (item) {
+                return item.text.toLowerCase().startsWith(identifier.toLowerCase());
+              });
+              if (found.length === 1) {
+                idx = items.findIndex(function (item) {
+                  return item.text.toLowerCase().startsWith(identifier.toLowerCase());
+                });
+              }
+              if (found.length > 1) {
+                response = "there was more than one item with that text — please be more specific";
+              }
+              if (found.length === 0) {
+                response = "no items matched that text, please try again";
+              }
+              break;
+            case 'index':
+              var intId = parseInt(identifier, 10);
+              if (Number.isInteger(intId)) {
+                idx = intId - 1;
+              }
+              break;
+            default:
+              break;
+          }
+          if (idx > -1) {
+            if (idx >= items.length) {
+              response = "that item does not exist";
+            } else {
+              setRemovalPaused(true);
+              setTimeout(function () {
+                return setRemovalPaused(false);
+              }, debounce);
+              return [].concat(_toConsumableArray(items.slice(0, idx)), _toConsumableArray(items.slice(idx + 1)));
+            }
+          } else {
+            if (!response) {
+              response = "that item does not exist";
+            }
+          }
+          return items;
         });
-        if (idx !== -1) {
-          return [].concat(_toConsumableArray(items.slice(0, idx)), _toConsumableArray(items.slice(idx + 1)));
-        } else {
-          response = "that item does not exist";
-        }
-        return items;
-      });
+      }
     } else {
       response = "you didn't specify the name of an item to remove";
     }
@@ -313,6 +388,7 @@ var App = function App() {
     if (actionHandlers[handlerName] && actionHandlers[handlerName].security(context, command)) {
       var response = actionHandlers[handlerName].handle(context, command);
       if (response) {
+        console.log("@" + context.username + " \u2014 " + response);
         client.say(target, "@" + context.username + " \u2014 " + response);
       }
     }
@@ -357,9 +433,14 @@ var App = function App() {
       style: {
         backgroundColor: "rgba(" + config.colors.background + ", " + config.colors.backgroundOpacity + ")",
         color: "rgba(" + config.colors.foreground + ", " + config.colors.foregroundOpacity + ")",
-        fontSize: config.font.baseSize
+        fontSize: config.font.baseSize,
+        textAlign: config.font.textAlign,
+        marginBottom: config.position.vMargin,
+        marginTop: config.position.vMargin,
+        marginLeft: config.position.hMargin,
+        marginRight: config.position.hMargin
       },
-      className: "overlayList__root" + (active ? " overlayList__root--active" : "")
+      className: "overlayList__root overlayList__root--h-" + config.position.horizontal + " overlayList__root--v-" + config.position.vertical + " " + (active ? " overlayList__root--active" : "")
     },
     React.createElement("h1", {
       style: { fontSize: config.font.titleSize },

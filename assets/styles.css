@@ -1,7 +1,12 @@
 .overlayList {
-    align-items: center;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+.overlayList__holder {
     display: grid;
-    justify-content: end;
     margin: 0;
     padding: 0;
     width: 100vw;
@@ -15,9 +20,32 @@
     opacity: 0;
     overflow: hidden;
     padding: 20px;
-    margin-right: 20px;
     transition: opacity 0.5s, height 0.5s;
     width: calc(20vw - 20px);
+}
+
+.overlayList__root--h-left {
+    justify-self: start;
+}
+
+.overlayList__root--h-right {
+    justify-self: end;
+}
+
+.overlayList__root--h-middle {
+    justify-self: center;
+}
+
+.overlayList__root--v-top {
+    align-self: start;
+}
+
+.overlayList__root--v-bottom {
+    align-self: end;
+}
+
+.overlayList__root--v-middle {
+    align-self: center;
 }
 
 .overlayList__root--active {
@@ -25,9 +53,6 @@
 }
 
 .overlayList__list {
-    align-items: flex-start;
-    display: flex;
-    flex-flow: column;
     list-style: none;
     margin: 0;
     padding: 0;

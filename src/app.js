@@ -25,6 +25,12 @@ const App = () => {
   const [active, setActive] = React.useState(
     maybeGetFromStorage("overlayListActive", false)
   );
+  const [removalPaused, _setRemovalPaused] = React.useState(false);
+  const removalPausedRef = React.useRef(removalPaused);
+  const setRemovalPaused = (data) => {
+    removalPausedRef.current = data;
+    _setRemovalPaused(data);
+  }
 
   const formatText = (message, emotes, makeUpperCase = false) => {
     // parse the message for html and remove any tags
@@ -167,18 +173,33 @@ const App = () => {
       },
     },
     // =======================================
-    // Command: !list:remove <name>
-    // Description: removes an item in the list using its name (to avoid mod collisions)
+    // Command: !list:remove <identifier>
+    // Description: removes an item in the list using its identifier (see README)
     // =======================================
     ":remove": {
       security: (context, _textContent) => {
         return isMod(context) || isBroadcaster(context);
       },
       handle: (context, command) => {
-        const name = formatText(command, context.emotes).split(
+        const identifier = formatText(command, context.emotes).split(
           `${config.commandNameBase}:remove `
         )[1];
-        return removeTask(name);
+        return removeTask(identifier);
+      },
+    },
+    // =======================================
+    // Command: !list:remove <index>
+    // Description: removes an item in the list using its 1-based index
+    // =======================================
+    ":removeIndex": {
+      security: (context, _textContent) => {
+        return isMod(context) || isBroadcaster(context);
+      },
+      handle: (context, command) => {
+        const identifier = formatText(command, context.emotes).split(
+          `${config.commandNameBase}:removeIndex `
+        )[1];
+        return removeTask(identifier, true);
       },
     },
     // =======================================
@@ -269,25 +290,73 @@ const App = () => {
     });
   };
 
-  const removeTask = (name) => {
+  const removeTask = (identifier, forceIndex) => {
     let response = null;
-    if (name && name !== "") {
-      setItems((items) => {
-        const idx = items.findIndex(
-          (item) => item.text.toLowerCase() === name.toLowerCase()
-        );
-        if (idx !== -1) {
-          return [...items.slice(0, idx), ...items.slice(idx + 1)];
-        } else {
-          response = "that item does not exist";
-        }
-        return items;
-      });
+    let method = config.handlerOptions.removalMethod;
+    if (forceIndex) {
+      method = 'index';
+    }
+    let debounce = 3000;
+    if (config.handlerOptions.removalDebounce && Number.isInteger(config.handlerOptions.removalDebounce)) {
+      debounce = config.handlerOptions.removalDebounce * 1000;
+    }
+    if (identifier && identifier !== "") {
+      if (method === 'index' && removalPausedRef.current) {
+        response = `you can't use this command just now, try again in ${debounce / 1000} seconds`;
+      } else {
+        setItems((items) => {
+          let idx = -1;
+          switch (method) {
+            case 'fullText':
+              idx = items.findIndex(
+                (item) => item.text.toLowerCase() === identifier.toLowerCase()
+              );
+              break;
+            case 'startsWithText':
+              const found = items.filter((item) => item.text.toLowerCase().startsWith(identifier.toLowerCase()));
+              if (found.length === 1) {
+                idx = items.findIndex(
+                  (item) => item.text.toLowerCase().startsWith(identifier.toLowerCase())
+                );
+              }
+              if (found.length > 1) {
+                response = "there was more than one item with that text — please be more specific";
+              }
+              if (found.length === 0) {
+                response = "no items matched that text, please try again";
+              }
+              break;
+            case 'index':
+              const intId = parseInt(identifier, 10);
+              if (Number.isInteger(intId)) {
+                idx = intId - 1;
+              }
+              break;
+            default:
+              break;
+          }
+          if (idx > -1) {
+            if (idx >= items.length) {
+              response = "that item does not exist";
+            } else {
+              setRemovalPaused(true);
+              setTimeout(() => setRemovalPaused(false), debounce);
+              return [...items.slice(0, idx), ...items.slice(idx + 1)];
+            }
+          } else {
+            if (!response) {
+              response = "that item does not exist";
+            }
+          }
+          return items;
+        });
+      }
     } else {
       response = "you didn't specify the name of an item to remove";
     }
     return response;
   };
+
 
   const clearTasks = () => {
     setItems([]);
@@ -307,6 +376,7 @@ const App = () => {
     ) {
       const response = actionHandlers[handlerName].handle(context, command);
       if (response) {
+        console.log(`@${context.username} — ${response}`);
         client.say(target, `@${context.username} — ${response}`);
       }
     }
@@ -349,8 +419,13 @@ const App = () => {
         backgroundColor: `rgba(${config.colors.background}, ${config.colors.backgroundOpacity})`,
         color: `rgba(${config.colors.foreground}, ${config.colors.foregroundOpacity})`,
         fontSize: config.font.baseSize,
+        textAlign: config.font.textAlign,
+        marginBottom: config.position.vMargin,
+        marginTop: config.position.vMargin,
+        marginLeft: config.position.hMargin,
+        marginRight: config.position.hMargin,
       }}
-      className={`overlayList__root${
+      className={`overlayList__root overlayList__root--h-${config.position.horizontal} overlayList__root--v-${config.position.vertical} ${
         active ? " overlayList__root--active" : ""
       }`}
     >
