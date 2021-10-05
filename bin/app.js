@@ -308,25 +308,25 @@ var App = function App() {
     var response = null;
     var method = config.handlerOptions.removalMethod;
     if (forceIndex) {
-      method = 'index';
+      method = "index";
     }
     var debounce = 3000;
     if (config.handlerOptions.removalDebounce && Number.isInteger(config.handlerOptions.removalDebounce)) {
       debounce = config.handlerOptions.removalDebounce * 1000;
     }
     if (identifier && identifier !== "") {
-      if (method === 'index' && removalPausedRef.current) {
+      if (method === "index" && removalPausedRef.current) {
         response = "you can't use this command just now, try again in " + debounce / 1000 + " seconds";
       } else {
         setItems(function (items) {
           var idx = -1;
           switch (method) {
-            case 'fullText':
+            case "fullText":
               idx = items.findIndex(function (item) {
                 return item.text.toLowerCase() === identifier.toLowerCase();
               });
               break;
-            case 'startsWithText':
+            case "startsWithText":
               var found = items.filter(function (item) {
                 return item.text.toLowerCase().startsWith(identifier.toLowerCase());
               });
@@ -342,7 +342,7 @@ var App = function App() {
                 response = "no items matched that text, please try again";
               }
               break;
-            case 'index':
+            case "index":
               var intId = parseInt(identifier, 10);
               if (Number.isInteger(intId)) {
                 idx = intId - 1;
@@ -449,7 +449,7 @@ var App = function App() {
     React.createElement(
       "ul",
       {
-        className: "overlayList__list",
+        className: "overlayList__list " + (config.useListSymbols ? "overlayList__list--listSymbolsActive" : null),
         style: {
           borderTopColor: "rgba(" + config.colors.foreground + ", " + config.colors.foregroundOpacity / 2 + ")"
         }

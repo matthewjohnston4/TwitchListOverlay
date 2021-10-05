@@ -21,7 +21,7 @@
     overflow: hidden;
     padding: 20px;
     transition: opacity 0.5s, height 0.5s;
-    width: calc(20vw - 20px);
+    width: calc(25vw - 20px);
 }
 
 .overlayList__root--h-left {
@@ -56,6 +56,12 @@
     list-style: none;
     margin: 0;
     padding: 0;
+}
+
+.overlayList__list--listSymbolsActive li::before {
+    content: '\2022';
+    display: inline;
+    padding-right: 8px;
 }
 
 .overlayList__list:not(:empty) {

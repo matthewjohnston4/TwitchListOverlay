@@ -30,7 +30,7 @@ const App = () => {
   const setRemovalPaused = (data) => {
     removalPausedRef.current = data;
     _setRemovalPaused(data);
-  }
+  };
 
   const formatText = (message, emotes, makeUpperCase = false) => {
     // parse the message for html and remove any tags
@@ -294,39 +294,47 @@ const App = () => {
     let response = null;
     let method = config.handlerOptions.removalMethod;
     if (forceIndex) {
-      method = 'index';
+      method = "index";
     }
     let debounce = 3000;
-    if (config.handlerOptions.removalDebounce && Number.isInteger(config.handlerOptions.removalDebounce)) {
+    if (
+      config.handlerOptions.removalDebounce &&
+      Number.isInteger(config.handlerOptions.removalDebounce)
+    ) {
       debounce = config.handlerOptions.removalDebounce * 1000;
     }
     if (identifier && identifier !== "") {
-      if (method === 'index' && removalPausedRef.current) {
-        response = `you can't use this command just now, try again in ${debounce / 1000} seconds`;
+      if (method === "index" && removalPausedRef.current) {
+        response = `you can't use this command just now, try again in ${
+          debounce / 1000
+        } seconds`;
       } else {
         setItems((items) => {
           let idx = -1;
           switch (method) {
-            case 'fullText':
+            case "fullText":
               idx = items.findIndex(
                 (item) => item.text.toLowerCase() === identifier.toLowerCase()
               );
               break;
-            case 'startsWithText':
-              const found = items.filter((item) => item.text.toLowerCase().startsWith(identifier.toLowerCase()));
+            case "startsWithText":
+              const found = items.filter((item) =>
+                item.text.toLowerCase().startsWith(identifier.toLowerCase())
+              );
               if (found.length === 1) {
-                idx = items.findIndex(
-                  (item) => item.text.toLowerCase().startsWith(identifier.toLowerCase())
+                idx = items.findIndex((item) =>
+                  item.text.toLowerCase().startsWith(identifier.toLowerCase())
                 );
               }
               if (found.length > 1) {
-                response = "there was more than one item with that text — please be more specific";
+                response =
+                  "there was more than one item with that text — please be more specific";
               }
               if (found.length === 0) {
                 response = "no items matched that text, please try again";
               }
               break;
-            case 'index':
+            case "index":
               const intId = parseInt(identifier, 10);
               if (Number.isInteger(intId)) {
                 idx = intId - 1;
@@ -356,7 +364,6 @@ const App = () => {
     }
     return response;
   };
-
 
   const clearTasks = () => {
     setItems([]);
@@ -425,7 +432,9 @@ const App = () => {
         marginLeft: config.position.hMargin,
         marginRight: config.position.hMargin,
       }}
-      className={`overlayList__root overlayList__root--h-${config.position.horizontal} overlayList__root--v-${config.position.vertical} ${
+      className={`overlayList__root overlayList__root--h-${
+        config.position.horizontal
+      } overlayList__root--v-${config.position.vertical} ${
         active ? " overlayList__root--active" : ""
       }`}
     >
@@ -434,7 +443,9 @@ const App = () => {
         dangerouslySetInnerHTML={{ __html: title }}
       />
       <ul
-        className="overlayList__list"
+        className={`overlayList__list ${
+          config.useListSymbols ? "overlayList__list--listSymbolsActive" : null
+        }`}
         style={{
           borderTopColor: `rgba(${config.colors.foreground}, ${
             config.colors.foregroundOpacity / 2

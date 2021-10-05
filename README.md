@@ -43,7 +43,6 @@ You can also modify `assets/styles.css` if you know how to use CSS, and replace 
 
 If you don't want to use sounds, leave the filenames as empty strings `""` in `config-general.js`.
 
-
 ### Handler Options
 
 The `removalMethod` setting determines how the `:remove` subcommand works:
@@ -51,6 +50,13 @@ The `removalMethod` setting determines how the `:remove` subcommand works:
 * `fullText` - anyone using the command will need to type the exact text of an item to remove it.
 * `startsWithText` - a best attempt will be made to pick an item that starts with the string used. If more than one item matches, none will be removed and an error message will be sent back to the command user.
 * `index` - uses a one-based index (ie. starts from 1) to identify the item to remove. When this setting is used, `removalDebounce` is active - this disables additional use of the `:remove` command for a number of seconds. This can be useful to prevent collisions between multiple users calling the same command, but using `index` is still riskier.
+
+### Customising list symbols
+
+Change the `useListSymbols` config-general setting if you want to enable or disable the display of list item markers.
+
+Adjust the CSS property for `.overlayList__list--listSymbolsActive li::before` to modify what symbol gets used as the item marker. You can use the CSS code for any HTML character entity, as listed here: https://www.toptal.com/designers/htmlarrows/punctuation/
+
 
 ----
 
