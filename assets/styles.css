@@ -68,6 +68,7 @@
     display: block;
     position: relative;
     width: auto;
+    text-decoration: line-through;
 }
 
 .overlayList__listItem--complete .overlayList__listItemLine {
