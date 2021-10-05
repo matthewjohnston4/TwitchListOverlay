@@ -35,8 +35,7 @@ All these subcommands can vary based on the value of `commandNameBase` in `confi
 * `!list:show` shows the overlay, if it was previously hidden, with any previous values for title and items retained.
 * `!list:removeIndex <itemNumber>` removes an item from the list, by specifying a 1-based index.
 
-
-## Customising
+## Customising
 
 There are a few common settings to edit in `config-general.js` in order to adjust how the overlay looks and sounds.
 
