@@ -140,4 +140,6 @@ To upgrade, you can backup your `config-general.js` and `config-local.js` files,
 
 This project was originally based on the great [TwitchPopups project](https://github.com/DaftLimmy/TwitchPopups). If you like this one, check that one out too.
 
+No need to credit me, but if you want to chuck me a donation, [go to my Ko-fi](https://ko-fi.com/matthewathome)
+
 Included sounds used under Creative Commons license from https://freesound.org/people/rhodesmas/
