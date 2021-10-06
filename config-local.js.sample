@@ -1,7 +1,9 @@
 // Fill in your twitchUser and rename this file to config-local.js
 
-// When someone initiate commands, you can optionally enable this overlay to notify the
-// user whenever there's something incorrect about their use of the command.
+// When someone initiate commands, you can optionally enable this overlay to notify that
+// person whenever there's something incorrect about their use of the command.
+// For example, if they try to remove an item, and the command was invalid, they'll know about it
+// rather than it just failing silently.
 // To use this error notification functionality, you'll need a Twitch account that you want to
 // authorize for API use. You can use your main Twitch account, but messages will appear to come
 // from it. Or you can create an alternate account with a Bot-like username. It's up to you.

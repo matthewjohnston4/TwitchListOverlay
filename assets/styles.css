@@ -1,27 +1,21 @@
 .overlayList {
     margin: 0;
     padding: 0;
-    width: 100vw;
-    height: 100vh;
 }
 
 .overlayList__holder {
     display: grid;
+    height: 100vh;
     margin: 0;
     padding: 0;
     width: 100vw;
-    height: 100vh;
 }
 
 .overlayList__root {
-    background-color: rgba(0, 0, 0, 0.5);
-    font-family: 'Open Sans Condensed';
-    max-height: calc(60vh - 20px);
+    box-sizing: border-box;
     opacity: 0;
     overflow: hidden;
-    padding: 20px;
     transition: opacity 0.5s, height 0.5s;
-    width: calc(25vw - 20px);
 }
 
 .overlayList__root--h-left {
@@ -36,15 +30,15 @@
     justify-self: center;
 }
 
-.overlayList__root--v-top {
+.overlayList__root--v-downwards {
     align-self: start;
 }
 
-.overlayList__root--v-bottom {
+.overlayList__root--v-upwards {
     align-self: end;
 }
 
-.overlayList__root--v-middle {
+.overlayList__root--v-fromCentre {
     align-self: center;
 }
 
@@ -58,10 +52,10 @@
     padding: 0;
 }
 
-.overlayList__list--listSymbolsActive li::before {
-    content: '\2022';
+.overlayList__list--listSymbolsActive li .overlayList__listItemSymbol {
     display: inline;
     padding-right: 8px;
+    font-style: normal;
 }
 
 .overlayList__list:not(:empty) {

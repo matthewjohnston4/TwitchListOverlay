@@ -1,5 +1,6 @@
 *.code-workspace
 config-local.js
+assets/styles_extra.css
 .DS_Store
 
 # Logs

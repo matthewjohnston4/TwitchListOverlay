@@ -70,6 +70,10 @@ var App = function App() {
     return newMessage.join("");
   };
 
+  var defaultSecurityCheck = function defaultSecurityCheck() {
+    return isMod(context) || isBroadcaster(context);
+  };
+
   var actionHandlers = {
     // =======================================
     // Command: !list:new <text>
@@ -77,7 +81,7 @@ var App = function App() {
     // =======================================
     ":new": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(context, textContent) {
         var formattedText = formatText(textContent, context.emotes).split(config.commandNameBase + ":new ")[1];
@@ -92,7 +96,7 @@ var App = function App() {
     // =======================================
     ":title": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(context, textContent) {
         var formattedText = formatText(textContent, context.emotes).split(config.commandNameBase + ":title ")[1];
@@ -107,7 +111,7 @@ var App = function App() {
     // =======================================
     ":hide": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(_context, _textContent) {
         setActive(false);
@@ -119,7 +123,7 @@ var App = function App() {
     // =======================================
     ":show": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(_context, _textContent) {
         if (!active) {
@@ -134,7 +138,7 @@ var App = function App() {
     // =======================================
     ":delete": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(context, textContent) {
         deleteOverlay();
@@ -146,7 +150,7 @@ var App = function App() {
     // =======================================
     ":add": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(context, textContent) {
         var formattedText = formatText(textContent, context.emotes).split(config.commandNameBase + ":add ")[1];
@@ -156,12 +160,27 @@ var App = function App() {
       }
     },
     // =======================================
+    // Command: !list:addSilent <text>
+    // Description: adds an item to the list without effecting list visibility
+    // =======================================
+    ":addSilent": {
+      security: function security(context, _textContent) {
+        return defaultSecurityCheck;
+      },
+      handle: function handle(context, textContent) {
+        var formattedText = formatText(textContent, context.emotes).split(config.commandNameBase + ":addSilent ")[1];
+        if (formattedText && formattedText !== "") {
+          return addTask(formattedText, true);
+        }
+      }
+    },
+    // =======================================
     // Command: !list:complete <itemNumber>
     // Description: completes an item in the list using its 1-based index
     // =======================================
     ":complete": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(context, command) {
         var itemNumber = parseInt(command.split(config.commandNameBase + ":complete ")[1]);
@@ -176,7 +195,7 @@ var App = function App() {
     // =======================================
     ":remove": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(context, command) {
         var identifier = formatText(command, context.emotes).split(config.commandNameBase + ":remove ")[1];
@@ -189,7 +208,7 @@ var App = function App() {
     // =======================================
     ":removeIndex": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(context, command) {
         var identifier = formatText(command, context.emotes).split(config.commandNameBase + ":removeIndex ")[1];
@@ -202,7 +221,7 @@ var App = function App() {
     // =======================================
     ":clear": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(_context, _command) {
         clearTasks();
@@ -210,7 +229,7 @@ var App = function App() {
     },
     ":empty": {
       security: function security(context, _textContent) {
-        return isMod(context) || isBroadcaster(context);
+        return defaultSecurityCheck;
       },
       handle: function handle(_context, _command) {
         clearTasks();
@@ -242,7 +261,7 @@ var App = function App() {
   };
 
   var addTask = function addTask(text) {
-    var place = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    var silent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     var response = null;
     setItems(function (items) {
@@ -280,14 +299,19 @@ var App = function App() {
         response = "that item already exists";
         return items;
       } else {
+        if (silent) {
+          response = "item silently added";
+        }
         return [].concat(_toConsumableArray(items), [{ text: text, complete: false }]);
       }
     });
-    setActive(true);
-    if (active) {
-      maybePlaySound(config.sounds.newItem);
-    } else {
-      maybePlaySound(config.sounds.activate);
+    if (!silent) {
+      setActive(true);
+      if (active) {
+        maybePlaySound(config.sounds.newItem);
+      } else {
+        maybePlaySound(config.sounds.activate);
+      }
     }
     return response;
   };
@@ -433,14 +457,17 @@ var App = function App() {
       style: {
         backgroundColor: "rgba(" + config.colors.background + ", " + config.colors.backgroundOpacity + ")",
         color: "rgba(" + config.colors.foreground + ", " + config.colors.foregroundOpacity + ")",
+        fontFamily: config.font.family,
         fontSize: config.font.baseSize,
         textAlign: config.font.textAlign,
         marginBottom: config.position.vMargin,
         marginTop: config.position.vMargin,
         marginLeft: config.position.hMargin,
-        marginRight: config.position.hMargin
+        marginRight: config.position.hMargin,
+        padding: config.position.padding,
+        width: config.position.width
       },
-      className: "overlayList__root overlayList__root--h-" + config.position.horizontal + " overlayList__root--v-" + config.position.vertical + " " + (active ? " overlayList__root--active" : "")
+      className: "overlayList__root overlayList__root--h-" + config.position.horizontal + " overlayList__root--v-" + config.position.fillMethod + " " + (active ? " overlayList__root--active" : "")
     },
     React.createElement("h1", {
       style: { fontSize: config.font.titleSize },
@@ -455,14 +482,22 @@ var App = function App() {
         }
       },
       Array.from(items).map(function (item, idx) {
-        return React.createElement("li", {
-          key: "item_" + idx,
-          style: {
-            color: "rgba(" + config.colors.foreground + ", " + (item.complete ? config.colors.foregroundOpacity / 1.5 : config.colors.foregroundOpacity) + ")"
+        return React.createElement(
+          "li",
+          {
+            key: "item_" + idx,
+            style: {
+              color: "rgba(" + config.colors.foreground + ", " + (item.complete ? config.colors.foregroundOpacity / 1.5 : config.colors.foregroundOpacity) + ")"
+            },
+            className: item.complete ? "overlayList__listItem overlayList__listItem--complete" : "overlayList__listItem"
           },
-          className: item.complete ? "overlayList__listItem overlayList__listItem--complete" : "overlayList__listItem",
-          dangerouslySetInnerHTML: { __html: item.text }
-        });
+          config.useListSymbols ? React.createElement(
+            "i",
+            { className: "overlayList__listItemSymbol" },
+            config.listSymbol
+          ) : null,
+          item.text
+        );
       })
     )
   );
