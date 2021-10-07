@@ -470,6 +470,7 @@ const App = () => {
         active ? " overlayList__root--active" : ""
       }`}
     >
+      {/* Use dangerouslySetInnerHTML to allow emotes to work */}
       <h1
         style={{ fontSize: config.font.titleSize }}
         dangerouslySetInnerHTML={{ __html: title }}
@@ -503,6 +504,7 @@ const App = () => {
             {config.useListSymbols ? (
               <i className="overlayList__listItemSymbol">{config.listSymbol}</i>
             ) : null}
+            {/* Use dangerouslySetInnerHTML to allow emotes to work */}
             <span dangerouslySetInnerHTML={{ __html: item.text }} />
           </li>
         ))}
