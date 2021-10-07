@@ -12,7 +12,7 @@ This overlay includes use of local browser storage — lists are saved and can b
 
 If you want to use this overlay, you'll need OBS or similar and be comfortable editing a settings file for configuration.
 
-1. Download the ZIP archive here and extract to your local machine or just clone this repo.
+1. Download the ZIP archive of [the latest stable release](https://github.com/matthewjohnston4/TwitchListOverlay/releases) and extract to your local machine or just clone this repo.
 2. In the extracted files, rename `config-local.js.sample` to `config-local.js`.
 3. Fill in `twitchUser` in `config-local.js` with your Twitch channel username.
 4. _Optional_ Fill in `password` and `botUsername` in `config-local.js` to enable chat-based errors for command users (see the comments in `config-local.js.sample` for a longer explanation).
