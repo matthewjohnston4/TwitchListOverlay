@@ -70,10 +70,6 @@ var App = function App() {
     return newMessage.join("");
   };
 
-  var defaultSecurityCheck = function defaultSecurityCheck() {
-    return isMod(context) || isBroadcaster(context);
-  };
-
   var actionHandlers = {
     // =======================================
     // Command: !list:new <text>
@@ -81,7 +77,7 @@ var App = function App() {
     // =======================================
     ":new": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(context, textContent) {
         var formattedText = formatText(textContent, context.emotes).split(config.commandNameBase + ":new ")[1];
@@ -96,7 +92,7 @@ var App = function App() {
     // =======================================
     ":title": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(context, textContent) {
         var formattedText = formatText(textContent, context.emotes).split(config.commandNameBase + ":title ")[1];
@@ -111,7 +107,7 @@ var App = function App() {
     // =======================================
     ":hide": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(_context, _textContent) {
         setActive(false);
@@ -123,7 +119,7 @@ var App = function App() {
     // =======================================
     ":show": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(_context, _textContent) {
         if (!active) {
@@ -138,7 +134,7 @@ var App = function App() {
     // =======================================
     ":delete": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(context, textContent) {
         deleteOverlay();
@@ -150,7 +146,7 @@ var App = function App() {
     // =======================================
     ":add": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(context, textContent) {
         var formattedText = formatText(textContent, context.emotes).split(config.commandNameBase + ":add ")[1];
@@ -165,7 +161,7 @@ var App = function App() {
     // =======================================
     ":addSilent": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(context, textContent) {
         var formattedText = formatText(textContent, context.emotes).split(config.commandNameBase + ":addSilent ")[1];
@@ -180,7 +176,7 @@ var App = function App() {
     // =======================================
     ":complete": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(context, command) {
         var itemNumber = parseInt(command.split(config.commandNameBase + ":complete ")[1]);
@@ -195,7 +191,7 @@ var App = function App() {
     // =======================================
     ":remove": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(context, command) {
         var identifier = formatText(command, context.emotes).split(config.commandNameBase + ":remove ")[1];
@@ -208,7 +204,7 @@ var App = function App() {
     // =======================================
     ":removeIndex": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(context, command) {
         var identifier = formatText(command, context.emotes).split(config.commandNameBase + ":removeIndex ")[1];
@@ -221,7 +217,7 @@ var App = function App() {
     // =======================================
     ":clear": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(_context, _command) {
         clearTasks();
@@ -229,7 +225,7 @@ var App = function App() {
     },
     ":empty": {
       security: function security(context, _textContent) {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: function handle(_context, _command) {
         clearTasks();

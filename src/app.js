@@ -64,10 +64,6 @@ const App = () => {
     return newMessage.join("");
   };
 
-  const defaultSecurityCheck = () => {
-    return isMod(context) || isBroadcaster(context);
-  }
-
   const actionHandlers = {
     // =======================================
     // Command: !list:new <text>
@@ -75,7 +71,7 @@ const App = () => {
     // =======================================
     ":new": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (context, textContent) => {
         const formattedText = formatText(textContent, context.emotes).split(
@@ -92,7 +88,7 @@ const App = () => {
     // =======================================
     ":title": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (context, textContent) => {
         const formattedText = formatText(textContent, context.emotes).split(
@@ -109,7 +105,7 @@ const App = () => {
     // =======================================
     ":hide": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (_context, _textContent) => {
         setActive(false);
@@ -121,7 +117,7 @@ const App = () => {
     // =======================================
     ":show": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (_context, _textContent) => {
         if (!active) {
@@ -136,7 +132,7 @@ const App = () => {
     // =======================================
     ":delete": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (context, textContent) => {
         deleteOverlay();
@@ -148,7 +144,7 @@ const App = () => {
     // =======================================
     ":add": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (context, textContent) => {
         const formattedText = formatText(textContent, context.emotes).split(
@@ -165,7 +161,7 @@ const App = () => {
     // =======================================
     ":addSilent": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (context, textContent) => {
         const formattedText = formatText(textContent, context.emotes).split(
@@ -182,7 +178,7 @@ const App = () => {
     // =======================================
     ":complete": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (context, command) => {
         const itemNumber = parseInt(
@@ -199,7 +195,7 @@ const App = () => {
     // =======================================
     ":remove": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (context, command) => {
         const identifier = formatText(command, context.emotes).split(
@@ -214,7 +210,7 @@ const App = () => {
     // =======================================
     ":removeIndex": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (context, command) => {
         const identifier = formatText(command, context.emotes).split(
@@ -229,7 +225,7 @@ const App = () => {
     // =======================================
     ":clear": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (_context, _command) => {
         clearTasks();
@@ -237,7 +233,7 @@ const App = () => {
     },
     ":empty": {
       security: (context, _textContent) => {
-        return defaultSecurityCheck;
+        return isMod(context) || isBroadcaster(context);
       },
       handle: (_context, _command) => {
         clearTasks();
