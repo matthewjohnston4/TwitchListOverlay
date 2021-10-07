@@ -26,20 +26,36 @@ You're done! Now you can test this out by typing `!list:new Hello, World!` in yo
 
 All these subcommands can vary based on the value of `commandNameBase` in `config-general.js`:
 
-* `!list:new <title>` creates a new list with the specified title. Overwrites any stored list.
-* `!list:add <text>` adds an item to the list with the specified text.
-* `!list:complete <itemNumber>` completes an item using its numbered position in the list (this number is 1-based, not array-like 0-based).
-* `!list:delete` deletes all content from the overlay and hides it — you may want to just hide it with `!list:hide` as below.
-* `!list:remove <identifier>` removes an item from the list, by specifying some identifier. The default identifier is to type the exact string of text of the item you want to remove, but you can customise this as shown below (in "Handler Options").
-* `!list:clear` or `!list:empty` empties a list of all items, while keeping the title and leaving the overlay active.
-* `!list:title <title>` sets a new title for the list using the specified text.
-* `!list:hide` hides the overlay, but retains all of the entered items and titles. Useful if you want to come back to the same list later in a stream.
-* `!list:show` shows the overlay, if it was previously hidden, with any previous values for title and items retained.
+### List and title commands:
 
-### Advanced commands
+* **Creating a new list:**  
+   `!list:new <title>` creates a new list with the specified title. Overwrites any stored list.
+* **Deleting and hiding the list:**  
+   `!list:delete` deletes all content from the overlay and hides it — you may want to just hide it with `!list:hide` as below.
+* **Hiding the overlay:**  
+   `!list:hide` hides the overlay, but retains all of the entered items and titles. Useful if you want to come back to the same list later in a stream.
+* **Showing the overlay:**  
+   `!list:show` shows the overlay, if it was previously hidden, with any previous values for title and items retained.
+* **Changing list title:**  
+   `!list:title <title>` sets a new title for the list using the specified text.
+   
+### Item commands: 
+
+* **Adding a new item:**  
+   `!list:add <text>` adds an item to the list with the specified text.
+* **Marking an item as complete:**  
+   `!list:complete <itemNumber>` completes an item using its numbered position in the list (just count its position, this is not 0-indexed like an array).
+* **Removing a specific item:**  
+   `!list:remove <identifier>` removes an item from the list, by specifying some identifier. The default identifier is to type the exact string of text of the item you want to remove, but you can customise this as shown below (in "Handler Options").
+* **Removing all items without hiding list:**  
+   `!list:clear` or `!list:empty` empties a list of all items, while keeping the title and leaving the overlay active.
+
+### Advanced commands
 
 * `!list:removeIndex <itemNumber>` removes an item from the list, by specifying a 1-based index.
 * `!list:addSilent <text>` adds an item to the list with the specified text, but doesn't 'show' the overlay if it is hidden.
+
+**Some notes about usage:** the list of items, and the title, are stored locally by your browser, and _will not clear_ by themselves. This can be very useful, if you want to retain a list over multiple streams, but if you can't remember whether you had a previous list, and want to start afresh, remember to use `!list:new` instead of `add` or `show`.
 
 ## Customising
 
@@ -91,9 +107,27 @@ The `removalMethod` setting determines how the `:remove` subcommand works:
 * `startsWithText` - a best attempt will be made to pick an item that starts with the string used. If more than one item matches, none will be removed and an error message will be sent back to the command user.
 * `index` - uses a one-based index (ie. starts from 1) to identify the item to remove. When this setting is used, `removalDebounce` is active - this disables additional use of the `:remove` command for a number of seconds. This can be useful to prevent collisions between multiple users calling the same command, but using `index` is still riskier.
 
+## Upgrading
+
+To upgrade, you can backup your `styles_extra.css`, `config-general.js`, and `config-local.js` files, delete the overlay directory, and then re-download. Copy relevant configuration settings back in again afterwards. And make sure OBS has refreshed your updates.
+
+After you have updated, I recommend testing the overlay a while yourself, and make sure that it all works as expected. I run a bunch of manual tests before putting up new versions of the overlay, but can't give it quite as much of a test as a live stream will provide.
+
+## Reporting feedback or bugs 
+
+Please use the ["Issues" tab](https://github.com/matthewjohnston4/TwitchListOverlay/issues) here on Github to report any problems or ideas you might have for the overlay.
+
+## Credits
+
+This project was originally based on the great [TwitchPopups project](https://github.com/DaftLimmy/TwitchPopups). If you like this one, check that one out too.
+
+No need to credit me (a shoutout to twitch.tv/matthewindublin would be very nice of you if you feel like it) but if you want to chuck me a donation, [go to my Ko-fi](https://ko-fi.com/matthewathome).
+
+Included sounds used under Creative Commons license from https://freesound.org/people/rhodesmas/
+
 ----
 
-## ADVANCED: Add custom handles
+## ADVANCED: Making custom handles and modifying the `src/app.js` source
 
 If you want to add your own handlers, you will need to understand JavaScript, React, and the tmi.js library. We'll also use Babel, but you don't really need to understand what it does (processes React's JSX format into plain, browser-compatible JavaScript), as I've included the necessary steps below in "Preprocessing after making code changes".
 
@@ -123,7 +157,7 @@ Once you have answered those questions you are ready to add the handler.
 
 `src/app.js` and `src/helpers.js` contain a few handy functions that you can reuse in your custom handlers.
 
-## Preprocessing after making code changes
+## Preprocessing after making code changes
 
 After you've made changes to any `src/*` files, you'll need to re-preprocess them into compatible JavaScript using Babel. It's pretty simple, if you have Node (v12.13.0 was used to create this) and NPM (v6.13.4) installed:
 
@@ -131,15 +165,3 @@ After you've made changes to any `src/*` files, you'll need to re-preprocess the
 2. Run `npx babel --watch src --out-dir bin --presets react-app/prod`
 
 The second command will launch an auto-watcher which will look for changes in `src/` and process them into `bin/` where `twitchOverlays.htm` expects them to be.
-
-## Upgrading
-
-To upgrade, you can backup your `config-general.js` and `config-local.js` files, delete the overlay directory, and then re-download. Copy relevant configuration settings back in again afterwards. And make sure OBS has refreshed your updates.
-
-## Credits
-
-This project was originally based on the great [TwitchPopups project](https://github.com/DaftLimmy/TwitchPopups). If you like this one, check that one out too.
-
-No need to credit me, but if you want to chuck me a donation, [go to my Ko-fi](https://ko-fi.com/matthewathome)
-
-Included sounds used under Creative Commons license from https://freesound.org/people/rhodesmas/
