@@ -1,4 +1,4 @@
-const config = {
+export const config = {
   commandNameBase: "!list", // the base command name that all the subcommands are derived from
   handlerOptions: {
     removalMethod: "startsWithText", // one of "fullText", "startsWithText", or "index"

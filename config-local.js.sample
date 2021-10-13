@@ -13,7 +13,7 @@
 
 // If you don't want to use chat reply, just leave the values blank.
 
-const configLocal = {
+export const configLocal = {
   "twitchUser": "",
   "password": "",
   "botUsername": "",

@@ -28,26 +28,26 @@ All these subcommands can vary based on the value of `commandNameBase` in `confi
 
 ### List and title commands:
 
-* **Creating a new list:**  
+* **Creating a new list:**
    `!list:new <title>` creates a new list with the specified title. Overwrites any stored list.
-* **Deleting and hiding the list:**  
+* **Deleting and hiding the list:**
    `!list:delete` deletes all content from the overlay and hides it — you may want to just hide it with `!list:hide` as below.
-* **Hiding the overlay:**  
+* **Hiding the overlay:**
    `!list:hide` hides the overlay, but retains all of the entered items and titles. Useful if you want to come back to the same list later in a stream.
-* **Showing the overlay:**  
+* **Showing the overlay:**
    `!list:show` shows the overlay, if it was previously hidden, with any previous values for title and items retained.
-* **Changing list title:**  
+* **Changing list title:**
    `!list:title <title>` sets a new title for the list using the specified text.
-   
-### Item commands: 
 
-* **Adding a new item:**  
+### Item commands:
+
+* **Adding a new item:**
    `!list:add <text>` adds an item to the list with the specified text.
-* **Marking an item as complete:**  
+* **Marking an item as complete:**
    `!list:complete <itemNumber>` completes an item using its numbered position in the list (just count its position, this is not 0-indexed like an array).
-* **Removing a specific item:**  
+* **Removing a specific item:**
    `!list:remove <identifier>` removes an item from the list, by specifying some identifier. The default identifier is to type the exact string of text of the item you want to remove, but you can customise this as shown below (in "Handler Options").
-* **Removing all items without hiding list:**  
+* **Removing all items without hiding list:**
    `!list:clear` or `!list:empty` empties a list of all items, while keeping the title and leaving the overlay active.
 
 ### Advanced commands
@@ -113,7 +113,7 @@ To upgrade, you can backup your `styles_extra.css`, `config-general.js`, and `co
 
 After you have updated, I recommend testing the overlay a while yourself, and make sure that it all works as expected. I run a bunch of manual tests before putting up new versions of the overlay, but can't give it quite as much of a test as a live stream will provide.
 
-## Reporting feedback or bugs 
+## Reporting feedback or bugs
 
 Please use the ["Issues" tab](https://github.com/matthewjohnston4/TwitchListOverlay/issues) here on Github to report any problems or ideas you might have for the overlay.
 
@@ -162,6 +162,6 @@ Once you have answered those questions you are ready to add the handler.
 After you've made changes to any `src/*` files, you'll need to re-preprocess them into compatible JavaScript using Babel. It's pretty simple, if you have Node (v12.13.0 was used to create this) and NPM (v6.13.4) installed:
 
 1. Run `npm i` from the project root.
-2. Run `npx babel --watch src --out-dir bin --presets react-app/prod`
+2. Run `npm run build`.
 
-The second command will launch an auto-watcher which will look for changes in `src/` and process them into `bin/` where `twitchOverlays.htm` expects them to be.
+You can also use `npm run watch` which will launch an auto-watcher which will look for changes in `src/` and process them into `bin/` where `twitchOverlays.htm` expects them to be.

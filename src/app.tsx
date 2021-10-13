@@ -1,6 +1,27 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React from "react";
+import {render} from "react-dom";
+import tmi, { ChatUserstate } from 'tmi.js';
+import {config} from '../config-general';
+import {configLocal} from '../config-local';
+import { maybeGetFromStorage, maybePlaySound, isMod, isBroadcaster } from "./helpers";
+
+interface Item {
+  text: string;
+  complete: boolean;
+}
+
+interface SecurityFunc {
+  (context: ChatUserstate, _textContent: string): boolean
+}
+
+interface ActionFunc {
+  (context: ChatUserstate, _textContent: string): string | null
+}
+
 const App = () => {
   // Create a client with our channel from the configLocal file
-  let opts = {
+  const opts: tmi.Options = {
     channels: [configLocal.twitchUser],
   };
   if (
@@ -14,35 +35,35 @@ const App = () => {
       password: configLocal.password,
     };
   }
-  let client = new tmi.client(opts);
+  const client = new tmi.client(opts);
 
   const [title, setTitle] = React.useState(
-    maybeGetFromStorage("overlayListTitle", "")
+    maybeGetFromStorage("overlayListTitle", "") as string
   );
   const [items, setItems] = React.useState(
-    maybeGetFromStorage("overlayListItems", [])
+    maybeGetFromStorage("overlayListItems", []) as Item[]
   );
   const [active, setActive] = React.useState(
-    maybeGetFromStorage("overlayListActive", false)
+    maybeGetFromStorage("overlayListActive", false) as boolean
   );
   const [removalPaused, _setRemovalPaused] = React.useState(false);
   const removalPausedRef = React.useRef(removalPaused);
-  const setRemovalPaused = (data) => {
+  const setRemovalPaused = (data: boolean) => {
     removalPausedRef.current = data;
     _setRemovalPaused(data);
   };
 
-  const formatText = (message, emotes, makeUpperCase = false) => {
+  const formatText = (message: string, emotes: any, makeUpperCase = false) => {
     // parse the message for html and remove any tags
     if (makeUpperCase) {
       message = message.toUpperCase();
     }
-    let newMessage = message.split("");
+    const newMessage = message.split("");
     // replace any twitch emotes in the message with img tags for those emotes
     if (config.twitchEmotes) {
-      for (let emoteIndex in emotes) {
+      for (const emoteIndex in emotes) {
         const emote = emotes[emoteIndex];
-        for (let charIndexes in emote) {
+        for (const charIndexes in emote) {
           let emoteIndexes = emote[charIndexes];
           if (typeof emoteIndexes == "string") {
             emoteIndexes = emoteIndexes.split("-");
@@ -64,29 +85,30 @@ const App = () => {
     return newMessage.join("");
   };
 
-  const defaultSecurityCheck = (context) => {
+  const defaultSecurityCheck = (context: ChatUserstate) => {
     if (context) {
       return isMod(context) || isBroadcaster(context);
     }
     return false;
   };
 
-  const actionHandlers = {
+  const actionHandlers: {[handler: string]: {security: SecurityFunc, handle: ActionFunc}} = {
     // =======================================
     // Command: !list:new <text>
     // Description: Creates a new list with the specified title. Overwrites any stored list.
     // =======================================
     ":new": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (context, textContent) => {
+      handle: (context: ChatUserstate, textContent: string) => {
         const formattedText = formatText(textContent, context.emotes).split(
           `${config.commandNameBase}:new `
         )[1];
         if (formattedText && formattedText !== "") {
           createList(formattedText);
         }
+        return null;
       },
     },
     // =======================================
@@ -94,16 +116,17 @@ const App = () => {
     // Description: sets a new title for the list
     // =======================================
     ":title": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (context, textContent) => {
+      handle: (context: ChatUserstate, textContent: string) => {
         const formattedText = formatText(textContent, context.emotes).split(
           `${config.commandNameBase}:title `
         )[1];
         if (formattedText && formattedText !== "") {
           updateTitle(formattedText);
         }
+        return null;
       },
     },
     // =======================================
@@ -111,11 +134,12 @@ const App = () => {
     // Description: hides the overlay without deleting any of the contents
     // =======================================
     ":hide": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (_context, _textContent) => {
+      handle: (_context: ChatUserstate, _textContent: string) => {
         setActive(false);
+        return null;
       },
     },
     // =======================================
@@ -123,14 +147,15 @@ const App = () => {
     // Description: shows the overlay as it was previously set
     // =======================================
     ":show": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (_context, _textContent) => {
+      handle: (_context: ChatUserstate, _textContent: string) => {
         if (!active) {
           maybePlaySound(config.sounds.activate);
         }
         setActive(true);
+        return null;
       },
     },
     // =======================================
@@ -138,11 +163,12 @@ const App = () => {
     // Description: hides the overlay and deletes all content
     // =======================================
     ":delete": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (context, textContent) => {
+      handle: (_context: ChatUserstate, _textContent: string) => {
         deleteOverlay();
+        return null;
       },
     },
     // =======================================
@@ -150,16 +176,17 @@ const App = () => {
     // Description: adds an item to the list
     // =======================================
     ":add": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (context, textContent) => {
+      handle: (context: ChatUserstate, textContent: string) => {
         const formattedText = formatText(textContent, context.emotes).split(
           `${config.commandNameBase}:add `
         )[1];
         if (formattedText && formattedText !== "") {
           return addTask(formattedText);
         }
+        return null;
       },
     },
     // =======================================
@@ -167,16 +194,17 @@ const App = () => {
     // Description: adds an item to the list without effecting list visibility
     // =======================================
     ":addSilent": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (context, textContent) => {
+      handle: (context: ChatUserstate, textContent: string) => {
         const formattedText = formatText(textContent, context.emotes).split(
           `${config.commandNameBase}:addSilent `
         )[1];
         if (formattedText && formattedText !== "") {
           return addTask(formattedText, true);
         }
+        return null;
       },
     },
     // =======================================
@@ -184,16 +212,17 @@ const App = () => {
     // Description: completes an item in the list using its 1-based index
     // =======================================
     ":complete": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (context, command) => {
+      handle: (_context: ChatUserstate, command: string) => {
         const itemNumber = parseInt(
           command.split(`${config.commandNameBase}:complete `)[1]
         );
         if (!isNaN(itemNumber)) {
           setComplete(itemNumber);
         }
+        return null;
       },
     },
     // =======================================
@@ -201,10 +230,10 @@ const App = () => {
     // Description: removes an item in the list using its identifier (see README)
     // =======================================
     ":remove": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (context, command) => {
+      handle: (context: ChatUserstate, command: string) => {
         const identifier = formatText(command, context.emotes).split(
           `${config.commandNameBase}:remove `
         )[1];
@@ -216,10 +245,10 @@ const App = () => {
     // Description: removes an item in the list using its 1-based index
     // =======================================
     ":removeIndex": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (context, command) => {
+      handle: (context: ChatUserstate, command: string) => {
         const identifier = formatText(command, context.emotes).split(
           `${config.commandNameBase}:removeIndex `
         )[1];
@@ -231,24 +260,26 @@ const App = () => {
     // Description: empties a list of all items, but keeps the title
     // =======================================
     ":clear": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (_context, _command) => {
+      handle: (_context: ChatUserstate, _command: string) => {
         clearTasks();
+        return null;
       },
     },
     ":empty": {
-      security: (context, _textContent) => {
+      security: (context: ChatUserstate, _textContent: string) => {
         return defaultSecurityCheck(context);
       },
-      handle: (_context, _command) => {
+      handle: (_context: ChatUserstate, _command: string) => {
         clearTasks();
+        return null;
       },
     },
   };
 
-  const createList = (title) => {
+  const createList = (title: string) => {
     deleteOverlay();
     setTitle(title);
     if (!active) {
@@ -257,7 +288,7 @@ const App = () => {
     setActive(true);
   };
 
-  const updateTitle = (text) => {
+  const updateTitle = (text: string) => {
     setTitle(text);
     if (!active) {
       maybePlaySound(config.sounds.activate);
@@ -271,7 +302,7 @@ const App = () => {
     setItems([]);
   };
 
-  const addTask = (text, silent = false) => {
+  const addTask = (text: string, silent = false) => {
     let response = null;
     setItems((items) => {
       // Only add item if it doesn't already exist
@@ -303,7 +334,7 @@ const App = () => {
     return response;
   };
 
-  const setComplete = (itemNumber) => {
+  const setComplete = (itemNumber: number) => {
     setItems((items) => {
       if (typeof items[itemNumber - 1] !== "undefined") {
         if (!items[itemNumber - 1]["complete"] && active) {
@@ -319,8 +350,8 @@ const App = () => {
     });
   };
 
-  const removeTask = (identifier, forceIndex) => {
-    let response = null;
+  const removeTask = (identifier: string, forceIndex = false) => {
+    let response = '';
     let method = config.handlerOptions.removalMethod;
     if (forceIndex) {
       method = "index";
@@ -398,7 +429,7 @@ const App = () => {
     setItems([]);
   };
 
-  const onMessage = (target, context, msg, _self) => {
+  const onMessage = (target: string, context: ChatUserstate, msg: string, _self: boolean) => {
     // Remove whitespace from chat message
     const command = msg.trim();
     const handlerName = command
@@ -411,14 +442,14 @@ const App = () => {
       actionHandlers[handlerName].security(context, command)
     ) {
       const response = actionHandlers[handlerName].handle(context, command);
-      if (response) {
+      if (response && response !== '') {
         console.log(`@${context.username} — ${response}`);
         client.say(target, `@${context.username} — ${response}`);
       }
     }
   };
 
-  const onConnected = (addr, port) => {
+  const onConnected = (addr: string, port: number) => {
     console.log(`* Connected to ${addr}:${port}`);
   };
 
@@ -447,8 +478,6 @@ const App = () => {
     localStorage.setItem("overlayListTitle", JSON.stringify(title));
   }, [title]);
 
-  const onChange = (event) => setValue(event.target.value);
-
   return (
     <div
       style={{
@@ -456,7 +485,6 @@ const App = () => {
         color: `rgba(${config.colors.foreground}, ${config.colors.foregroundOpacity})`,
         fontFamily: config.font.family,
         fontSize: config.font.baseSize,
-        textAlign: config.font.textAlign,
         marginBottom: config.position.vMargin,
         marginTop: config.position.vMargin,
         marginLeft: config.position.hMargin,
@@ -481,7 +509,7 @@ const App = () => {
         }`}
         style={{
           borderTopColor: `rgba(${config.colors.foreground}, ${
-            config.colors.foregroundOpacity / 2
+            parseInt(config.colors.foregroundOpacity) / 2
           })`,
         }}
       >
@@ -491,7 +519,7 @@ const App = () => {
             style={{
               color: `rgba(${config.colors.foreground}, ${
                 item.complete
-                  ? config.colors.foregroundOpacity / 1.5
+                  ? parseInt(config.colors.foregroundOpacity) / 1.5
                   : config.colors.foregroundOpacity
               })`,
             }}
@@ -513,7 +541,7 @@ const App = () => {
   );
 };
 
-ReactDOM.render(
-  <App>Hello, world!</App>,
+render(
+  <App></App>,
   document.querySelector(".overlayList__holder")
 );
