@@ -4,7 +4,8 @@
   "description": "Used to display a simple list overlay in OBS or whatever",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx babel src --out-dir bin --presets react-app/prod",
+    "watch": "npx babel --watch src --out-dir bin --presets react-app/prod"
   },
   "keywords": [],
   "author": "github.com/matthewjohnston4",
