@@ -127,9 +127,9 @@ Included sounds used under Creative Commons license from https://freesound.org/p
 
 ----
 
-## ADVANCED: Making custom handles and modifying the `src/app.js` source
+## ADVANCED: Making custom handles and modifying the `src/app.tsx` source
 
-If you want to add your own handlers, you will need to understand JavaScript, React, and the tmi.js library. We'll also use Babel, but you don't really need to understand what it does (processes React's JSX format into plain, browser-compatible JavaScript), as I've included the necessary steps below in "Preprocessing after making code changes".
+If you want to add your own handlers, you will need to understand TypeScript, React, and the tmi.js library. We'll also use Babel, but you don't really need to understand what it does (processes React's JSX format into plain, browser-compatible JavaScript), as I've included the necessary steps below in "Preprocessing after making code changes".
 
 There are a few extra things to consider.
 1. Do you want it to fire based on a !command?
@@ -139,14 +139,14 @@ There are a few extra things to consider.
 
 Once you have answered those questions you are ready to add the handler.
 
-1. Navigate to `src/app.js`
+1. Navigate to `src/app.tsx`
 2. Add a new entry to the `actionHandlers` constant using this format:
 ``` javascript
 ":subcommand": {
-    security: (context, textContent) => {
+    security: (context: ChatUserstate, textContent: string) => {
         return true; // This should return a boolean, true will fire the handler
     },
-    handle: (context, textContent) => {
+    handle: (context: ChatUserstate, textContent: string) => {
         // Place handle script here
         // If you want to send a message response in-channel, your handler should return
         // the message as a string. If not, you can leave it as a void function.
@@ -159,9 +159,9 @@ Once you have answered those questions you are ready to add the handler.
 
 ## Preprocessing after making code changes
 
-After you've made changes to any `src/*` files, you'll need to re-preprocess them into compatible JavaScript using Babel. It's pretty simple, if you have Node (v12.13.0 was used to create this) and NPM (v6.13.4) installed:
+After you've made changes to any `src/*` files, you'll need to re-preprocess them into compatible browser JavaScript using Webpack and Babel. It's pretty simple, if you have Node (v12.13.0 was used to create this) and NPM (v6.13.4) installed:
 
-1. Run `npm i` from the project root.
-2. Run `npm run build`.
+1. Run `npm i` from the project root. This will install a whole bunch of development pre-requisites, including Webpack, Babel, and some other plugins for those. You shouldn't need to configure anything, however.
+2. Run `npm run build`. This will run the TypeScript typechecker and an ESLint linter.
 
 You can also use `npm run watch` which will launch an auto-watcher which will look for changes in `src/` and process them into `bin/` where `twitchOverlays.htm` expects them to be.
