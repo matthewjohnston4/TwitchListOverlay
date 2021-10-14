@@ -1,8 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import path from "path";
-import { Configuration } from "webpack";
+import { Compiler, Configuration } from "webpack";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import ESLintPlugin from "eslint-webpack-plugin";
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
+
+class WatchTimerPlugin {
+  apply(compiler: Compiler) {
+    compiler.hooks.afterDone.tap('Watch Timer Plugin', () => {
+      console.log(`============[Finished at ${new Date().toLocaleString()}]============`);
+    });
+  }
+}
 
 const config: Configuration = {
   mode: "production",
@@ -41,6 +50,7 @@ const config: Configuration = {
       extensions: ["js", "jsx", "ts", "tsx"],
     }),
     new CleanWebpackPlugin(),
+    new WatchTimerPlugin(),
   ],
 };
 

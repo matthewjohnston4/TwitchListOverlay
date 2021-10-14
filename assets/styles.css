@@ -99,3 +99,92 @@ h1 img.emoticon {
     height: 22px;
     margin-bottom: -4px;
 }
+
+.overlayList__listItem {
+    display: flex;
+}
+
+.overlayList__adminControls {
+    display: flex;
+    margin-left: auto;
+}
+
+.overlayList__adminAction {
+    align-items: center;
+    background: white;
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    height: 24px;
+    justify-content: center;
+    margin-left: 0.5rem;
+    width: 24px;
+}
+.overlayList__adminTitle {
+    display: flex;
+    width: 100%;
+}
+
+.overlayList__adminTitle input {
+    background: #1d1c1d;
+    border: 0;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    flex: 0 1 70%;
+    max-width: 70%;
+}
+
+.overlayList__adminItemEdit {
+    background: #1d1c1d;
+    border: 0;
+    color: #fff;
+    font-size: 16px;
+    flex: 0 1 50%;
+    max-width: 50%;
+}
+
+.overlayList__adminComplete {
+    background: #17cf79;
+}
+
+.overlayList__adminClear,
+.overlayList__adminRemove {
+    background: #de4e2b;
+}
+
+.overlayList__adminActionIcon {
+    height: 16px;
+    width: 16px;
+}
+
+.overlayList__adminAdd {
+    border-top: 1px solid rgba(255,255,255,0.5);
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+.overlayList__adminAdd h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.overlayList__adminAdd input {
+    background: #1d1c1d;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 16px;
+    padding: 0.5rem;
+}
+
+.overlayList__adminInput {
+    display: flex;
+    margin-top: 0.5rem;
+}
+
+.overlayList__adminAddButton {
+    margin-left: auto;
+}
+
+.overlayList__adminInput input {
+}
