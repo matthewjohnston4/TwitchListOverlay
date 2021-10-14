@@ -1,4 +1,5 @@
-export const config = {
+/* eslint-disable @typescript-eslint/no-unused-vars */
+window.config = {
   commandNameBase: "!list", // the base command name that all the subcommands are derived from
   handlerOptions: {
     removalMethod: "startsWithText", // one of "fullText", "startsWithText", or "index"
@@ -7,8 +8,8 @@ export const config = {
   useListSymbols: true, // Should a bullet symbol be added to each item?
   listSymbol: "•", // the bullet symbol you want to use. Can be any unicode symbol or standard emoji
   position: {
-    horizontal: "left", // one of `left`, `right`, or `middle`
-    fillMethod: "upwards", // one of `fromCentre`, `upwards`, or `downwards`
+    horizontal: "right", // one of `left`, `right`, or `middle`
+    fillMethod: "downwards", // one of `fromCentre`, `upwards`, or `downwards`
     hMargin: "50px", // horizontal margins of list
     vMargin: "50px", // vertical margins of list
     padding: "20px", // padding on the overlay list

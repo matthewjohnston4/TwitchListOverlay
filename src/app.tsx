@@ -1,13 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   FunctionComponent,
-  KeyboardEventHandler,
   useEffect,
 } from "react";
 import { render } from "react-dom";
 import tmi, { ChatUserstate } from "tmi.js";
-import { config } from "../config-general";
-import { configLocal } from "../config-local";
 import {
   maybeGetFromStorage,
   maybePlaySound,
@@ -40,18 +38,20 @@ interface ActionFunc {
 
 const App = () => {
   // Create a client with our channel from the configLocal file
+  const configLocalLoad = (window as any).configLocal;
+  const configLoad = (window as any).config;
   const opts: tmi.Options = {
-    channels: [configLocal.twitchUser],
+    channels: [configLocalLoad.twitchUser],
   };
   if (
-    configLocal.botUsername &&
-    configLocal.password &&
-    configLocal.botUsername !== "" &&
-    configLocal.password !== ""
+    configLocalLoad.botUsername &&
+    configLocalLoad.password &&
+    configLocalLoad.botUsername !== "" &&
+    configLocalLoad.password !== ""
   ) {
     opts["identity"] = {
-      username: configLocal.botUsername,
-      password: configLocal.password,
+      username: configLocalLoad.botUsername,
+      password: configLocalLoad.password,
     };
   }
   const client = new tmi.client(opts);
@@ -88,7 +88,7 @@ const App = () => {
     }
     const newMessage = Array.from(message);
     // replace any twitch emotes in the message with img tags for those emotes
-    if (config.twitchEmotes && emotes) {
+    if (configLoad.twitchEmotes && emotes) {
       for (const emoteKey in emotes) {
         const emotePositions = emotes[emoteKey];
         emotePositions.forEach((emotePosition) => {
@@ -126,7 +126,7 @@ const App = () => {
       },
       handle: (context: ChatUserstate, textContent: string) => {
         const formattedText = formatText(textContent, context.emotes).split(
-          `${config.commandNameBase}:new `
+          `${configLoad.commandNameBase}:new `
         )[1];
         if (formattedText && formattedText !== "") {
           createList(formattedText);
@@ -144,7 +144,7 @@ const App = () => {
       },
       handle: (context: ChatUserstate, textContent: string) => {
         const formattedText = formatText(textContent, context.emotes).split(
-          `${config.commandNameBase}:title `
+          `${configLoad.commandNameBase}:title `
         )[1];
         if (formattedText && formattedText !== "") {
           updateTitle(formattedText);
@@ -175,7 +175,7 @@ const App = () => {
       },
       handle: (_context: ChatUserstate, _textContent: string) => {
         if (!active) {
-          maybePlaySound(config.sounds.activate);
+          maybePlaySound(configLoad.sounds.activate);
         }
         setActive(true);
         return null;
@@ -204,7 +204,7 @@ const App = () => {
       },
       handle: (context: ChatUserstate, textContent: string) => {
         const formattedText = formatText(textContent, context.emotes).split(
-          `${config.commandNameBase}:add `
+          `${configLoad.commandNameBase}:add `
         )[1];
         if (formattedText && formattedText !== "") {
           return addTask(formattedText);
@@ -223,7 +223,7 @@ const App = () => {
       },
       handle: (context: ChatUserstate, textContent: string) => {
         const formattedText = formatText(textContent, context.emotes).split(
-          `${config.commandNameBase}:addSilent `
+          `${configLoad.commandNameBase}:addSilent `
         )[1];
         if (formattedText && formattedText !== "") {
           return addTask(formattedText, true);
@@ -242,7 +242,7 @@ const App = () => {
       },
       handle: (_context: ChatUserstate, command: string) => {
         const itemNumber = parseInt(
-          command.split(`${config.commandNameBase}:complete `)[1]
+          command.split(`${configLoad.commandNameBase}:complete `)[1]
         );
         if (!isNaN(itemNumber)) {
           setComplete(itemNumber);
@@ -260,7 +260,7 @@ const App = () => {
       },
       handle: (context: ChatUserstate, command: string) => {
         const identifier = formatText(command, context.emotes).split(
-          `${config.commandNameBase}:remove `
+          `${configLoad.commandNameBase}:remove `
         )[1];
         return removeTask(identifier);
       },
@@ -275,7 +275,7 @@ const App = () => {
       },
       handle: (context: ChatUserstate, command: string) => {
         const identifier = formatText(command, context.emotes).split(
-          `${config.commandNameBase}:removeIndex `
+          `${configLoad.commandNameBase}:removeIndex `
         )[1];
         return removeTask(identifier, true);
       },
@@ -308,7 +308,7 @@ const App = () => {
     deleteOverlay();
     setTitle(title);
     if (!active) {
-      maybePlaySound(config.sounds.activate);
+      maybePlaySound(configLoad.sounds.activate);
     }
     setActive(true);
   };
@@ -316,7 +316,7 @@ const App = () => {
   const updateTitle = (text: string) => {
     setTitle(text);
     if (!active) {
-      maybePlaySound(config.sounds.activate);
+      maybePlaySound(configLoad.sounds.activate);
     }
     setActive(true);
   };
@@ -355,10 +355,10 @@ const App = () => {
       setActive(true);
       if (active) {
         if (added) {
-          maybePlaySound(config.sounds.newItem);
+          maybePlaySound(configLoad.sounds.newItem);
         }
       } else {
-        maybePlaySound(config.sounds.activate);
+        maybePlaySound(configLoad.sounds.activate);
       }
     }
     return response;
@@ -368,7 +368,7 @@ const App = () => {
     setItems((items) => {
       if (typeof items[itemNumber - 1] !== "undefined") {
         if (!items[itemNumber - 1]["complete"] && active) {
-          maybePlaySound(config.sounds.completeItem);
+          maybePlaySound(configLoad.sounds.completeItem);
         }
         return [
           ...items.slice(0, itemNumber - 1),
@@ -399,16 +399,16 @@ const App = () => {
     skipDebounce = false
   ) => {
     let response = "";
-    let method = config.handlerOptions.removalMethod;
+    let method = configLoad.handlerOptions.removalMethod;
     if (forceIndex) {
       method = "index";
     }
     let debounce = 3000;
     if (
-      config.handlerOptions.removalDebounce &&
-      Number.isInteger(config.handlerOptions.removalDebounce)
+      configLoad.handlerOptions.removalDebounce &&
+      Number.isInteger(configLoad.handlerOptions.removalDebounce)
     ) {
-      debounce = config.handlerOptions.removalDebounce * 1000;
+      debounce = configLoad.handlerOptions.removalDebounce * 1000;
     }
     if (identifier && identifier !== "") {
       if (method === "index" && removalPausedRef.current && !skipDebounce) {
@@ -486,7 +486,7 @@ const App = () => {
     const command = msg.trim();
     const handlerName = command
       .split(" ")[0]
-      .replace(config.commandNameBase, "");
+      .replace(configLoad.commandNameBase, "");
 
     // Check all commands
     if (
@@ -556,24 +556,24 @@ const App = () => {
       style={{
         backgroundColor: adminMode
           ? "#1d1c1d"
-          : `rgba(${config.colors.background}, ${config.colors.backgroundOpacity})`,
+          : `rgba(${configLoad.colors.background}, ${configLoad.colors.backgroundOpacity})`,
         color: adminMode
           ? "#fff"
-          : `rgba(${config.colors.foreground}, ${config.colors.foregroundOpacity})`,
-        fontFamily: config.font.family,
-        fontSize: config.font.baseSize,
-        marginBottom: adminMode ? 0 : config.position.vMargin,
-        marginTop: adminMode ? 0 : config.position.vMargin,
-        marginLeft: adminMode ? 0 : config.position.hMargin,
-        marginRight: adminMode ? 0 : config.position.hMargin,
-        textAlign: config.font.textAlign as Property.TextAlign,
-        padding: config.position.padding,
-        width: adminMode ? "100%" : config.position.width,
+          : `rgba(${configLoad.colors.foreground}, ${configLoad.colors.foregroundOpacity})`,
+        fontFamily: configLoad.font.family,
+        fontSize: configLoad.font.baseSize,
+        marginBottom: adminMode ? 0 : configLoad.position.vMargin,
+        marginTop: adminMode ? 0 : configLoad.position.vMargin,
+        marginLeft: adminMode ? 0 : configLoad.position.hMargin,
+        marginRight: adminMode ? 0 : configLoad.position.hMargin,
+        textAlign: configLoad.font.textAlign as Property.TextAlign,
+        padding: configLoad.position.padding,
+        width: adminMode ? "100%" : configLoad.position.width,
       }}
       className={`overlayList__root overlayList__root--h-${
-        adminMode ? "admin" : config.position.horizontal
+        adminMode ? "admin" : configLoad.position.horizontal
       } overlayList__root--v-${
-        adminMode ? "admin" : config.position.fillMethod
+        adminMode ? "admin" : configLoad.position.fillMethod
       } ${active ? " overlayList__root--active" : ""} ${
         adminMode ? " overlayList__root--active" : ""
       }`}
@@ -605,17 +605,17 @@ const App = () => {
         </div>
       ) : (
         <h1
-          style={{ fontSize: config.font.titleSize }}
+          style={{ fontSize: configLoad.font.titleSize }}
           dangerouslySetInnerHTML={{ __html: title }}
         />
       )}
       <ul
         className={`overlayList__list ${
-          config.useListSymbols ? "overlayList__list--listSymbolsActive" : null
+          configLoad.useListSymbols ? "overlayList__list--listSymbolsActive" : null
         }`}
         style={{
-          borderTopColor: `rgba(${config.colors.foreground}, ${
-            parseInt(config.colors.foregroundOpacity) / 2
+          borderTopColor: `rgba(${configLoad.colors.foreground}, ${
+            parseInt(configLoad.colors.foregroundOpacity) / 2
           })`,
         }}
       >
@@ -624,10 +624,10 @@ const App = () => {
             <li
               key={`item_${idx}`}
               style={{
-                color: `rgba(${config.colors.foreground}, ${
+                color: `rgba(${configLoad.colors.foreground}, ${
                   item.complete
-                    ? parseInt(config.colors.foregroundOpacity) / 1.5
-                    : config.colors.foregroundOpacity
+                    ? parseInt(configLoad.colors.foregroundOpacity) / 1.5
+                    : configLoad.colors.foregroundOpacity
                 })`,
               }}
               className={
@@ -636,9 +636,9 @@ const App = () => {
                   : "overlayList__listItem"
               }
             >
-              {config.useListSymbols ? (
+              {configLoad.useListSymbols ? (
                 <i className="overlayList__listItemSymbol">
-                  {config.listSymbol}
+                  {configLoad.listSymbol}
                 </i>
               ) : null}
               {/* Use dangerouslySetInnerHTML to allow emotes to work */}
@@ -701,6 +701,7 @@ type InputFieldProps = {
 
 const InputField: FunctionComponent<InputFieldProps> = ({ onAdd }) => {
   const [text, setText] = React.useState("");
+  const configLoad = (window as any).config;
   return (
     <div className="overlayList__adminInput">
       <input
@@ -716,8 +717,8 @@ const InputField: FunctionComponent<InputFieldProps> = ({ onAdd }) => {
       />
       <div
         style={{
-          backgroundColor: `rgba(${config.colors.foreground}, ${config.colors.foregroundOpacity})`,
-          color: `rgba(${config.colors.background}, ${config.colors.backgroundOpacity})`,
+          backgroundColor: `rgba(${configLoad.colors.foreground}, ${configLoad.colors.foregroundOpacity})`,
+          color: `rgba(${configLoad.colors.background}, ${configLoad.colors.backgroundOpacity})`,
         }}
         className="overlayList__adminAction overlayList__adminAddButton"
         onClick={() => onAdd(text)}
