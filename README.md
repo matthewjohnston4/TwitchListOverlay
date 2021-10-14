@@ -1,12 +1,12 @@
 # TwitchListOverlay
 
-A simple OBS overlay to allow a Twitch channel's broadcaster or mods to add a list of items, with a title.
+A simple OBS overlay to allow a Twitch channel's broadcaster or mods to add a titled list of items to their stream, via Twitch chat commands or an OBS broadcast dock.
 
 Ideal for objective lists, todo lists, schedules or whatever else comes in list form.
 
 This overlay includes use of local browser storage — lists are saved and can be re-used on subsequent streams on the same channel.
 
-<img width="966" src="https://user-images.githubusercontent.com/986185/123448347-ba471080-d5d2-11eb-8065-73154500c126.png">
+![2021-10-14 22 16 01](https://user-images.githubusercontent.com/986185/137397325-66dd4835-fb95-4e1e-a9f5-c058d0879389.gif)
 
 ## Installation
 
@@ -19,6 +19,7 @@ If you want to use this overlay, you'll need OBS or similar and be comfortable e
 4. Open OBS or whatever you're using, and add `twitchOverlays.html` as a Browser Source. Set `height` and `width` to the same dimensions as the resolution of your stream.
 5. _Optional:_ Enable "Shutdown source when not visible" to reload the overlay when you toggle its visibility — this is useful if you're making adjustments to the CSS or color variables.
 6. Position the overlay by dragging it to your preferred vertical location within OBS. Check out the `fillDirection` setting below for more on how you can customise how the overlay will expand vertically.
+7. _Optional:_ Enable an broadcaster-only admin mode OBS dock view as shown below.
 
 You're done! Now you can test this out by typing `!list:new Hello, World!` in your Twitch channel chat.
 
@@ -56,6 +57,30 @@ All these subcommands can vary based on the value of `commandNameBase` in `confi
 * `!list:addSilent <text>` adds an item to the list with the specified text, but doesn't 'show' the overlay if it is hidden.
 
 **Some notes about usage:** the list of items, and the title, are stored locally by your browser, and _will not clear_ by themselves. This can be very useful, if you want to retain a list over multiple streams, but if you can't remember whether you had a previous list, and want to start afresh, remember to use `!list:new` instead of `add` or `show`.
+
+
+## Admin mode OBS dock
+
+This overlay can be put into a special admin mode which allows editing of the list items and status directly in a browser. If you're using OBS, you can use this admin mode in a custom browser dock, which means it'll be visible and usable only by you.
+
+To enable this admin mode dock:
+1. Open `twitchOverlays.html` in a web browser, and copy the "URL" of the file location (ie. the address that starts `file://`).
+2. Open OBS
+3. Click the 'View' menu and select Docks > Custom Browser Docks...
+4. Add the copied URL from step 1 as a Dock URL, and append `?admin` to the URL. For example:
+
+    ```
+    file:///Users/matthewjohnston4/TwitchTodoOverlay/twitchOverlays.htm?admin
+    ```
+5. Click `Apply` then `Close`
+
+You should now have a resizeable dock window like this:
+
+<img width="281" alt="Screenshot 2021-10-14 at 21 41 18" src="https://user-images.githubusercontent.com/986185/137392314-14541cb1-066d-4c15-afe3-9ede295482a9.png">
+
+There are controls here for showing/hiding the list, clearing it, removing or completing items, and adding new items. You can also rename the title or the text of existing items by just clicking on them (they're in a disguised input box) and editing them with your keyboard.
+
+**NOTE** that unlike with the chat commands, edits to titles or item text will be shown in real-time. So you might still prefer to use the chat commands.
 
 ## Customising
 
