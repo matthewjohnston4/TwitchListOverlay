@@ -114,6 +114,8 @@ There are a few common settings to edit in `config-general.js` in order to adjus
     * `foregroundOpacity`: Decimal value (to one place) between 0 and 1.0 of the opacity of the text.
     * `background`: RGB value of the background of the list.
     * `backgroundOpacity`: Decimal value (to one place) between 0 and 1.0 of the opacity of the background of the list.
+* `style`:
+    * `rounded`: Set a px value for rounded corners of the overlay
 * `twitchEmotes`: Set to false to leave emote text as text, true to try and convert it to an image (GIFs do not work yet).
 * `sounds`: All sound options can be left as a blank string (`""`) if you don't want any sounds to play.
     * `activate`: Sound that plays when the commands `:new` or `:show` are used.

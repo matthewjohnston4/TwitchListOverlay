@@ -36,6 +36,11 @@ interface ActionFunc {
   (context: ChatUserstate, _textContent: string): string | null;
 }
 
+interface BackgroundStop {
+  color: string;
+  stop: number;
+}
+
 const App = () => {
   // Create a client with our channel from the configLocal file
   const configLocalLoad = (window as any).configLocal;
@@ -551,12 +556,30 @@ const App = () => {
     updateItem(event.target.value, index + 1);
   };
 
+  let bgColor = adminMode
+    ? "#1d1c1d"
+    : `rgba(${configLoad.colors.background}, ${configLoad.colors.backgroundOpacity})`;
+
+  const bgStops: BackgroundStop[] = configLoad.colors.backgroundGradient.stops ?? [];
+  const bgStopsString: string[] = [];
+
+  if (bgStops.length > 0) {
+    bgStops.forEach(stop => {
+      bgStopsString.push(`rgba(${stop.color}) ${stop.stop}%`);
+    });
+  }
+
+  if (bgStopsString.length > 0) {
+    bgColor = `linear-gradient(${configLoad.colors.backgroundGradient.direction ?? "45deg"}, ${bgStopsString.join(', ')})`;
+  }
+
   return (
     <div
       style={{
-        backgroundColor: adminMode
-          ? "#1d1c1d"
-          : `rgba(${configLoad.colors.background}, ${configLoad.colors.backgroundOpacity})`,
+        animation: configLoad.colors.backgroundAnimate ? `backgroundAnimate ${configLoad.colors.backgroundAnimateTiming ?? '10s'} ease infinite` : "none",
+        background: bgColor,
+        backgroundSize: configLoad.colors.backgroundAnimate ? "400% 400%" : "initial",
+        borderRadius: `${configLoad.style.rounded ?? 0}px`,
         color: adminMode
           ? "#fff"
           : `rgba(${configLoad.colors.foreground}, ${configLoad.colors.foregroundOpacity})`,
@@ -615,7 +638,7 @@ const App = () => {
         }`}
         style={{
           borderTopColor: `rgba(${configLoad.colors.foreground}, ${
-            parseInt(configLoad.colors.foregroundOpacity) / 2
+            parseInt(configLoad.colors.foregroundOpacity) / 3
           })`,
         }}
       >

@@ -60,8 +60,8 @@
 
 .overlayList__list:not(:empty) {
     border-top: 1px solid;
-    padding-top: 6px;
-    margin-top: 6px;
+    padding-top: 12px;
+    margin-top: 12px;
 }
 
 .overlayList__listItem--complete {
@@ -184,4 +184,18 @@ h1 img.emoticon {
 
 .overlayList__adminAddButton {
     margin-left: auto;
+}
+
+@keyframes backgroundAnimate {
+    0% {
+        background-position: 0% 50%
+    }
+
+    50% {
+        background-position: 100% 50%
+    }
+
+    100% {
+        background-position: 0% 50%
+    }
 }
