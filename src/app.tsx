@@ -2,7 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   FunctionComponent,
+  useCallback,
   useEffect,
+  useRef,
 } from "react";
 import { render } from "react-dom";
 import tmi, { ChatUserstate } from "tmi.js";
@@ -45,6 +47,7 @@ const App = () => {
   // Create a client with our channel from the configLocal file
   const configLocalLoad = (window as any).configLocal;
   const configLoad = (window as any).config;
+
   const opts: tmi.Options = {
     channels: [configLocalLoad.twitchUser],
   };
@@ -309,14 +312,15 @@ const App = () => {
     },
   };
 
-  const createList = (title: string) => {
+  const createList = useCallback((title: string) => {
     deleteOverlay();
     setTitle(title);
+    setAdminTitle(title);
     if (!active) {
       maybePlaySound(configLoad.sounds.activate);
     }
     setActive(true);
-  };
+  }, [active, configLoad]);
 
   const updateTitle = (text: string) => {
     setTitle(text);
@@ -329,6 +333,7 @@ const App = () => {
   const deleteOverlay = () => {
     setActive(false);
     setTitle("");
+    setAdminTitle("");
     setItems([]);
   };
 
@@ -417,9 +422,8 @@ const App = () => {
     }
     if (identifier && identifier !== "") {
       if (method === "index" && removalPausedRef.current && !skipDebounce) {
-        response = `you can't use this command just now, try again in ${
-          debounce / 1000
-        } seconds`;
+        response = `you can't use this command just now, try again in ${debounce / 1000
+          } seconds`;
       } else {
         setItems((items) => {
           let idx = -1;
@@ -549,16 +553,7 @@ const App = () => {
     });
   }, []);
 
-  const onAdminItemChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
-    updateItem(event.target.value, index + 1);
-  };
-
-  let bgColor = adminMode
-    ? "#1d1c1d"
-    : `rgba(${configLoad.colors.background}, ${configLoad.colors.backgroundOpacity})`;
+  let bgColor = `rgba(${configLoad.colors.background}, ${configLoad.colors.backgroundOpacity})`;
 
   const bgStops: BackgroundStop[] = configLoad.colors.backgroundGradient.stops ?? [];
   const bgStopsString: string[] = [];
@@ -573,13 +568,47 @@ const App = () => {
     bgColor = `linear-gradient(${configLoad.colors.backgroundGradient.direction ?? "45deg"}, ${bgStopsString.join(', ')})`;
   }
 
+  bgColor = adminMode
+    ? "#1d1c1d"
+    : bgColor;
+
+  // Admin-mode state items, variables, and methods
+
+  const adminTitleInput: React.RefObject<HTMLInputElement> = useRef(null);
+  const [adminTitle, setAdminTitle] = React.useState(title);
+  const listIsInUse = title !== '';
+
+  const onAdminItemChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    updateItem(event.target.value, index + 1);
+  };
+
+  const updateAdminTitle = useCallback((e) => {
+    setAdminTitle(e.target.value);
+  }, []);
+
+  const setTitleFromAdmin = useCallback(() => {
+    if (adminTitleInput.current) {
+      const newTitle = adminTitleInput.current.value;
+      if (listIsInUse) {
+        setTitle(newTitle);
+      } else {
+        createList(newTitle);
+      }
+    }
+  }, [listIsInUse, createList]);
+
+  const adminTitleHasUpdates = adminTitle !== title;
+
   return (
     <div
       style={{
         animation: configLoad.colors.backgroundAnimate ? `backgroundAnimate ${configLoad.colors.backgroundAnimateTiming ?? '10s'} ease infinite` : "none",
         background: bgColor,
         backgroundSize: configLoad.colors.backgroundAnimate ? "400% 400%" : "initial",
-        borderRadius: `${configLoad.style.rounded ?? 0}px`,
+        borderRadius: adminMode ? '0' : `${configLoad.style.rounded ?? 0}px`,
         color: adminMode
           ? "#fff"
           : `rgba(${configLoad.colors.foreground}, ${configLoad.colors.foregroundOpacity})`,
@@ -593,38 +622,51 @@ const App = () => {
         padding: configLoad.position.padding,
         width: adminMode ? "100%" : configLoad.position.width,
       }}
-      className={`overlayList__root overlayList__root--h-${
-        adminMode ? "admin" : configLoad.position.horizontal
-      } overlayList__root--v-${
-        adminMode ? "admin" : configLoad.position.fillMethod
-      } ${active ? " overlayList__root--active" : ""} ${
-        adminMode ? " overlayList__root--active" : ""
-      }`}
+      className={`overlayList__root overlayList__root--h-${adminMode ? "admin" : configLoad.position.horizontal
+        } overlayList__root--v-${adminMode ? "admin" : configLoad.position.fillMethod
+        } ${active ? " overlayList__root--active" : ""} ${adminMode ? " overlayList__root--active" : ""
+        }`}
     >
       {/* Use dangerouslySetInnerHTML to allow emotes to work */}
       {adminMode ? (
         <div className="overlayList__adminTitle">
-          <input
-            type="text"
-            value={title}
-            onChange={(event) => {
-              updateTitle(event.target.value);
-            }}
-          />
+          <h1>List overlay controls</h1>
           <div className="overlayList__adminControls">
-            <div
-              className="overlayList__adminAction overlayList__adminToggle"
-              onClick={() => setActive(!active)}
-            >
-              <img className="overlayList__adminActionIcon" src={showIcon} />
+            <div className="overlayList__adminVisibilityControl">
+              <span>Overlay visibility</span>
+              <div
+                className={`overlayList__adminAction overlayList__adminVisibility overlayList__adminVisibility--${active}`}
+                onClick={() => setActive(!active)}
+              >
+                <div className="overlayList__adminToggleControl">
+                  <div className="overlayList__adminToggleControlPill">
+                    <img className="overlayList__adminActionIcon" src={showIcon} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div
-              className="overlayList__adminAction overlayList__adminClear"
-              onClick={clearTasks}
-            >
-              <img className="overlayList__adminActionIcon" src={clearIcon} />
+            <div className="overlayList__adminVisibilityControl">
+              <span>Clear all items</span>
+              <div
+                className="overlayList__adminAction overlayList__adminClear"
+                onClick={clearTasks}
+              >
+                <img className="overlayList__adminActionIcon" src={clearIcon} />
+              </div>
             </div>
           </div>
+          <label>
+            Title
+            <div className="overlayList__adminTitleUpdateRow">
+              <input
+                type="text"
+                value={adminTitle}
+                ref={adminTitleInput}
+                onChange={updateAdminTitle}
+              />
+              <button className={`overlayList__adminTitleUpdate ${adminTitleHasUpdates ? 'overlayList__adminTitleUpdate--hasUpdates' : ''}`} onClick={setTitleFromAdmin}>{listIsInUse ? 'Save' : 'Add'}</button>
+            </div>
+          </label>
         </div>
       ) : (
         <h1
@@ -633,13 +675,11 @@ const App = () => {
         />
       )}
       <ul
-        className={`overlayList__list ${
-          configLoad.useListSymbols ? "overlayList__list--listSymbolsActive" : null
-        }`}
+        className={`overlayList__list ${configLoad.useListSymbols ? "overlayList__list--listSymbolsActive" : null
+          } ${adminMode ? "overlayList__adminItemList" : null}`}
         style={{
-          borderTopColor: `rgba(${configLoad.colors.foreground}, ${
-            parseInt(configLoad.colors.foregroundOpacity) / 3
-          })`,
+          borderTopColor: `rgba(${configLoad.colors.foreground}, ${parseInt(configLoad.colors.foregroundOpacity) / 3
+            })`,
         }}
       >
         {Array.from(items).map((item, idx) => {
@@ -647,11 +687,10 @@ const App = () => {
             <li
               key={`item_${idx}`}
               style={{
-                color: `rgba(${configLoad.colors.foreground}, ${
-                  item.complete
-                    ? parseInt(configLoad.colors.foregroundOpacity) / 1.5
-                    : configLoad.colors.foregroundOpacity
-                })`,
+                color: `rgba(${configLoad.colors.foreground}, ${item.complete
+                  ? parseInt(configLoad.colors.foregroundOpacity) / 1.5
+                  : configLoad.colors.foregroundOpacity
+                  })`,
               }}
               className={
                 item.complete
@@ -666,51 +705,50 @@ const App = () => {
               ) : null}
               {/* Use dangerouslySetInnerHTML to allow emotes to work */}
               {adminMode ? (
-                <input
-                  className="overlayList__adminItemEdit"
-                  type="text"
-                  disabled={item.complete}
-                  value={item.text}
-                  onChange={(event) => {
-                    onAdminItemChange(event, idx);
-                  }}
-                />
+                <div className="overlayList__adminListItemEditRow">
+                  <label>
+                    <input
+                      className="overlayList__adminItemEdit"
+                      type="text"
+                      disabled={item.complete}
+                      value={item.text}
+                      onChange={(event) => {
+                        onAdminItemChange(event, idx);
+                      }}
+                    />
+                  </label>
+                </div>
               ) : (
                 <span dangerouslySetInnerHTML={{ __html: item.text }} />
               )}
               {adminMode ? (
-                <div className="overlayList__adminControls">
+                <div className="overlayList__adminItemControls">
                   <div
-                    className="overlayList__adminAction overlayList__adminComplete"
+                    className="overlayList__adminActionLink overlayList__adminComplete"
                     onClick={() => {
                       setComplete(idx + 1);
                     }}
                   >
-                    <img
-                      className="overlayList__adminActionIcon"
-                      src={completeIcon}
-                    />
+                    Complete
                   </div>
                   <div
-                    className="overlayList__adminAction overlayList__adminRemove"
+                    className="overlayList__adminActionLink overlayList__adminRemove"
                     onClick={() => {
                       removeTask(`${idx + 1}`, true, true);
                     }}
                   >
-                    <img
-                      className="overlayList__adminActionIcon"
-                      src={deleteIcon}
-                    />
+                    Remove
                   </div>
                 </div>
               ) : null}
             </li>
           );
         })}
-        {adminMode ? (
+        {adminMode && listIsInUse ? (
           <div className="overlayList__adminAdd">
-            <h2>Add an item</h2>
-            <InputField onAdd={addTask} />
+            <label>Add an item
+              <InputField onAdd={addTask} />
+            </label>
           </div>
         ) : null}
       </ul>
@@ -724,7 +762,6 @@ type InputFieldProps = {
 
 const InputField: FunctionComponent<InputFieldProps> = ({ onAdd }) => {
   const [text, setText] = React.useState("");
-  const configLoad = (window as any).config;
   return (
     <div className="overlayList__adminInput">
       <input
@@ -739,11 +776,7 @@ const InputField: FunctionComponent<InputFieldProps> = ({ onAdd }) => {
         }}
       />
       <div
-        style={{
-          backgroundColor: `rgba(${configLoad.colors.foreground}, ${configLoad.colors.foregroundOpacity})`,
-          color: `rgba(${configLoad.colors.background}, ${configLoad.colors.backgroundOpacity})`,
-        }}
-        className="overlayList__adminAction overlayList__adminAddButton"
+        className={`overlayList__adminAddButton ${text !== '' ? 'overlayList__adminAddButton--hasUpdates' : ''}`}
         onClick={() => onAdd(text)}
       >
         <img

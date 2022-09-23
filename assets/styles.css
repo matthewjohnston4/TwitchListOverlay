@@ -106,51 +106,140 @@ h1 img.emoticon {
 
 .overlayList__adminControls {
     display: flex;
-    margin-left: auto;
+    flex-flow: row wrap;
+    margin-bottom: 1rem;
+}
+
+.overlayList__adminVisibilityControl {
+    align-items: center;
+    display: flex;
+    flex: 0 0 50%;
+    min-width: 100px;
+}
+
+.overlayList__adminVisibilityControl span {
+    color: #C4c7c9;
+    display: block;
+    font-size: 14px;
 }
 
 .overlayList__adminAction {
-    align-items: center;
-    background: white;
-    border-radius: 16px;
     cursor: pointer;
+    margin-left: 0.5rem;
+    position: relative;
+}
+
+.overlayList__adminVisibilityControl .overlayList__adminToggleControlPill {
+    align-items: center;
+    background: #1d1c1d;
+    border-radius: 16px;
+    content: '';
     display: flex;
     height: 24px;
     justify-content: center;
-    margin-left: 0.5rem;
     width: 24px;
 }
-.overlayList__adminTitle {
+
+.overlayList__adminVisibilityControl .overlayList__adminToggleControl {
+    align-items: center;
+    background: #525052;
+    border: 1px solid rgba(0,0,0,0.4);
+    border-radius: 16px;
     display: flex;
-    width: 100%;
+    height: 24px;
+    justify-content: left;
+    width: 48px;
 }
 
+.overlayList__adminVisibilityControl .overlayList__adminVisibility--true .overlayList__adminToggleControl {
+    background: rgb(189, 189, 189);
+    justify-content: right;
+}
+
+.overlayList__adminVisibilityControl .overlayList__adminVisibility--true .overlayList__adminToggleControlPill {
+    background: #0cff59;
+}
+
+.overlayList__adminClear {
+    align-items: center;
+    background: #dd3421;
+    border-radius: 16px;
+    content: '';
+    display: flex;
+    height: 24px;
+    justify-content: center;
+    width: 24px;
+}
+
+.overlayList__adminTitle {
+    font-family: Arial, Helvetica, sans-serif;
+    margin-bottom: 2rem;
+}
+
+.overlayList__adminTitle h1 {
+    display: block;
+    font-size: 18px;
+    font-weight: 100;
+    letter-spacing: normal;
+    margin-bottom: 1rem;
+}
+
+.overlayList__adminTitle label,
+.overlayList__listItem label,
+.overlayList__adminAdd label {
+    color: #C4c7c9;
+    display: block;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+}
+
+.overlayList__adminInput input,
+.overlayList__adminItemEdit,
 .overlayList__adminTitle input {
-    background: #1d1c1d;
+    background: #525052;
     border: 0;
+    border-radius: 4px;
     color: #fff;
-    font-size: 20px;
-    font-weight: bold;
-    flex: 0 1 70%;
-    max-width: 70%;
-}
-
-.overlayList__adminItemEdit {
-    background: #1d1c1d;
-    border: 0;
-    color: #fff;
+    display: block;
     font-size: 16px;
-    flex: 0 1 50%;
-    max-width: 50%;
+    font-weight: normal;
+    flex: 1 1 100%;
+    letter-spacing: normal;
+    margin-top: 4px;
+    padding: 0.5rem;
 }
 
-.overlayList__adminComplete {
-    background: #17cf79;
+.overlayList__adminInput,
+.overlayList__adminTitleUpdateRow {
+    display: flex;
+    flex-flow: row nowrap;
 }
 
-.overlayList__adminClear,
-.overlayList__adminRemove {
-    background: #de4e2b;
+.overlayList__adminAddButton,
+.overlayList__adminTitleUpdate {
+    background: #525052;
+    border: 0;
+    border-radius: 4px;
+    display: block;
+    margin-left: 4px;
+    margin-top: 4px;
+    padding: 4px;
+    width: 40px;
+}
+
+.overlayList__adminAddButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.overlayList__adminAddButton--hasUpdates,
+.overlayList__adminTitleUpdate--hasUpdates {
+    background: #35ec72;
+}
+
+.overlayList__adminClear {
+    background: #ef105e;
 }
 
 .overlayList__adminActionIcon {
@@ -158,32 +247,62 @@ h1 img.emoticon {
     width: 16px;
 }
 
-.overlayList__adminAdd {
-    border-top: 1px solid rgba(255,255,255,0.5);
+.overlayList__adminAdd,
+.overlayList__adminControls {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-family: Arial, Helvetica, sans-serif;
     margin-top: 1rem;
-    padding-top: 1rem;
+    padding: 1rem;
 }
 
 .overlayList__adminAdd h2 {
     margin: 0;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.overlayList__adminItemList::before {
+    content: 'List items';
+    display: block;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 18px;
+    font-weight: 100;
+    letter-spacing: normal;
+    margin-bottom: 1rem;
 }
 
-.overlayList__adminAdd input {
-    background: #1d1c1d;
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
-    font-size: 16px;
-    padding: 0.5rem;
+.overlayList__adminItemList li {
+    display: block;
+    margin-bottom: 1rem;
 }
 
-.overlayList__adminInput {
+.overlayList__adminItemList li .overlayList__listItemSymbol {
+    display: none;
+}
+
+.overlayList__adminListItemEditRow {
+    width: 100%;
+}
+
+.overlayList__adminItemControls {
     display: flex;
-    margin-top: 0.5rem;
+    gap: 0.5rem;
+    margin-top: 4px;
 }
 
-.overlayList__adminAddButton {
-    margin-left: auto;
+.overlayList__adminActionLink {
+    cursor: pointer;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+.overlayList__adminActionLink.overlayList__adminComplete {
+    color: #35ec72;
+}
+
+.overlayList__adminActionLink.overlayList__adminRemove {
+    color: #ef105e;
 }
 
 @keyframes backgroundAnimate {
